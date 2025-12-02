@@ -1,6 +1,6 @@
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Stars } from "@react-three/drei";
-import { Suspense, useState } from "react";
+import { Suspense, useState, useRef, useEffect } from "react";
 import { RadialMenu } from "./RadialMenu";
 import * as THREE from "three";
 import { useGameStore } from "../store/useGameStore";
@@ -123,13 +123,65 @@ export const GameCanvas = () => {
           />
         )}
 
-        <OrbitControls
-          makeDefault
-          minDistance={5}
-          maxDistance={30}
-          maxPolarAngle={Math.PI / 2.5} // Prevent going below ground
-        />
+        <ControlsWithSpacePan />
       </Suspense>
     </Canvas>
   );
 };
+
+function ControlsWithSpacePan() {
+  const controlsRef = useRef<any>(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.code === "Space" && controlsRef.current) {
+        controlsRef.current.mouseButtons.LEFT = THREE.MOUSE.PAN;
+        controlsRef.current.update();
+      }
+    };
+
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.code === "Space" && controlsRef.current) {
+        controlsRef.current.mouseButtons.LEFT = THREE.MOUSE.ROTATE;
+        controlsRef.current.update();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+    };
+  }, []);
+
+  return (
+    <OrbitControls
+      ref={controlsRef}
+      makeDefault
+      minDistance={5}
+      maxDistance={30}
+      maxPolarAngle={Math.PI / 2.5}
+      enablePan={true}
+      mouseButtons={{
+        LEFT: THREE.MOUSE.ROTATE,
+        MIDDLE: THREE.MOUSE.DOLLY,
+        RIGHT: THREE.MOUSE.PAN,
+      }}
+      touches={{
+        ONE: THREE.TOUCH.ROTATE,
+        TWO: THREE.TOUCH.PAN,
+      }}
+      onChange={(e) => {
+        if (!e?.target) return;
+        const controls = e.target as any;
+        // Clamp Pan Area
+        const limit = 15;
+        const x = THREE.MathUtils.clamp(controls.target.x, -limit, limit);
+        const z = THREE.MathUtils.clamp(controls.target.z, -limit, limit);
+        controls.target.set(x, 0, z);
+      }}
+    />
+  );
+}

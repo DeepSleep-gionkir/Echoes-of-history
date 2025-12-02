@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { GameHUD } from "./components/GameHUD";
 import { SanctionModal } from "./components/SanctionModal";
 import { LandingView } from "./components/LandingView";
@@ -40,6 +40,13 @@ function App() {
       setView("creation");
     }
   };
+
+  // Auto-login check
+  useEffect(() => {
+    if (user && view === "landing") {
+      handleStart();
+    }
+  }, [user]);
 
   const handleCreationComplete = async () => {
     // Create user in DB is handled inside NationCreationView or here

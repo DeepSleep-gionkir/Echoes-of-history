@@ -35,7 +35,11 @@
 4.  **Google**을 선택합니다.
 5.  Google Sign-In을 **활성화(Enable)**합니다.
 6.  Google Cloud Console에서 복사한 **클라이언트 ID**와 **클라이언트 보안 비밀**을 붙여넣습니다.
-7.  **Save**를 클릭합니다.
+7.  **Redirect URLs (중요)**:
+    - 기본적으로 Supabase는 `localhost:3000`을 Site URL로 잡는 경우가 많습니다.
+    - **URL Configuration** 섹션에서 **Redirect URLs**에 `http://localhost:5173` (Vite 기본 포트)을 반드시 추가해야 합니다.
+    - 이것을 추가하지 않으면 로그인 후 `localhost:3000`으로 이동하여 페이지가 뜨지 않을 수 있습니다.
+8.  **Save**를 클릭합니다.
 
 ## 3단계: 환경 변수
 

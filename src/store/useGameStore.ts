@@ -46,6 +46,7 @@ interface GameState {
   uiState: {
     sidePanelTab: "actions" | "council";
     showConstruction: boolean;
+    mobileTab: "map" | "office";
   };
   setUiState: (newState: Partial<GameState["uiState"]>) => void;
 
@@ -120,6 +121,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   uiState: {
     sidePanelTab: "actions",
     showConstruction: false,
+    mobileTab: "map", // "map" | "office"
   },
   setUiState: (newState: Partial<GameState["uiState"]>) =>
     set((state) => ({

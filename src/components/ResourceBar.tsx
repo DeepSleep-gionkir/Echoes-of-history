@@ -40,13 +40,13 @@ export const ResourceBar: React.FC = () => {
   };
 
   return (
-    <div className="w-full h-14 md:h-16 glass-panel flex items-center justify-between px-4 z-50 pointer-events-auto">
+    <div className="w-full h-14 xl:h-16 glass-panel flex items-center justify-between px-4 z-50 pointer-events-auto">
       {/* Left: Nation Info */}
       <div className="flex items-center gap-3 min-w-fit">
-        <div className="w-8 h-8 md:w-10 md:h-10 bg-slate-700 rounded-full flex items-center justify-center border border-white/10 shadow-inner">
+        <div className="w-8 h-8 xl:w-10 xl:h-10 bg-slate-700 rounded-full flex items-center justify-center border border-white/10 shadow-inner">
           <Flag size={18} className="text-stone-300" />
         </div>
-        <div className="hidden md:flex flex-col">
+        <div className="hidden xl:flex flex-col">
           <span className="text-sm font-bold text-stone-100 leading-tight">
             제국
           </span>
@@ -55,24 +55,25 @@ export const ResourceBar: React.FC = () => {
       </div>
 
       {/* Center: Resources (Scrollable on Mobile) */}
-      <div className="flex-1 mx-4 overflow-x-auto no-scrollbar">
-        <div className="flex items-center gap-4 md:gap-8 min-w-max px-2">
+      <div className="flex-1 mx-2 xl:mx-4 overflow-x-auto no-scrollbar">
+        <div className="flex items-center gap-3 xl:gap-8 min-w-max px-2">
           {Object.entries(resources).map(([key, value]) => {
             const income = getIncome(key);
             return (
               <div
                 key={key}
-                className="flex items-center gap-2 group cursor-help"
+                className="flex items-center gap-1.5 xl:gap-2 group cursor-help"
               >
-                <div className="p-1.5 bg-slate-900/50 rounded-md ring-1 ring-white/5 group-hover:ring-white/20 transition-all">
+                <div className="p-1 xl:p-1.5 bg-slate-900/50 rounded-md ring-1 ring-white/5 group-hover:ring-white/20 transition-all">
                   {resourceIcons[key]}
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-sm font-bold text-stone-100 font-mono leading-none">
+                  <span className="text-xs xl:text-sm font-bold text-stone-100 font-mono leading-none">
                     {value.toLocaleString()}
                   </span>
+                  {/* Hide income on very small screens unless expanded/hovered, or just keep it small */}
                   <span
-                    className={`text-[10px] font-mono ${
+                    className={`text-[9px] xl:text-[10px] font-mono ${
                       income >= 0 ? "text-emerald-400" : "text-rose-400"
                     }`}
                   >

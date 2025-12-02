@@ -30,13 +30,6 @@ export default {
         sans: ['"Pretendard Variable"', "-apple-system", "sans-serif"],
         serif: ['"Gowun Batang"', "serif"],
       },
-      animation: {
-        "stamp-drop":
-          "stamp-drop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards",
-        "fade-in": "fade-in 0.5s ease-out forwards",
-        "slide-up": "slide-up 0.3s ease-out forwards",
-        ticker: "ticker 30s linear infinite",
-      },
       keyframes: {
         "stamp-drop": {
           "0%": { transform: "scale(3) rotate(-15deg)", opacity: "0" },
@@ -54,6 +47,18 @@ export default {
           "0%": { transform: "translateX(100%)" },
           "100%": { transform: "translateX(-100%)" },
         },
+        marquee: {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(-50%)" },
+        },
+      },
+      animation: {
+        "stamp-drop":
+          "stamp-drop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards",
+        "fade-in": "fade-in 0.5s ease-out forwards",
+        "slide-up": "slide-up 0.3s ease-out forwards",
+        ticker: "ticker 30s linear infinite",
+        marquee: "marquee 60s linear infinite",
       },
     },
   },
