@@ -41,6 +41,13 @@ interface GameState {
   // Async Actions
   loadGame: () => Promise<void>;
   saveGame: () => Promise<void>;
+
+  // UI State
+  uiState: {
+    sidePanelTab: "actions" | "council";
+    showConstruction: boolean;
+  };
+  setUiState: (newState: Partial<GameState["uiState"]>) => void;
 }
 
 export const useGameStore = create<GameState>((set, get) => ({
@@ -104,6 +111,16 @@ export const useGameStore = create<GameState>((set, get) => ({
     }));
     get().saveGame();
   },
+
+  // UI State
+  uiState: {
+    sidePanelTab: "actions",
+    showConstruction: false,
+  },
+  setUiState: (newState: Partial<GameState["uiState"]>) =>
+    set((state) => ({
+      uiState: { ...state.uiState, ...newState },
+    })),
 
   loadGame: async () => {
     set({ isLoading: true });

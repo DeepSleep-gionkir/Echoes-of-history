@@ -1,13 +1,15 @@
-import { Canvas } from "@react-three/fiber";
-import { Suspense, useEffect } from "react";
-import { ResourceManager } from "./components/ResourceManager";
-import { ActionPanel } from "./components/ActionPanel";
+import { useEffect, useState } from "react";
+import { GameHUD } from "./components/GameHUD";
 import { SanctionModal } from "./components/SanctionModal";
-import { OrbitControls } from "@react-three/drei";
+import { LandingView } from "./components/LandingView";
+import { GameCanvas } from "./components/GameCanvas";
 import { useGameStore } from "./store/useGameStore";
 import { GameEngine } from "./logic/GameEngine";
 
+type ViewState = "landing" | "game";
+
 function App() {
+  const [view, setView] = useState<ViewState>("landing");
   const {
     pendingProposal,
     setPendingProposal,
@@ -17,7 +19,6 @@ function App() {
     updateResources,
     updateFactions,
     addLog,
-    logs,
     loadGame,
   } = useGameStore();
 
@@ -50,52 +51,19 @@ function App() {
     setPendingProposal(null);
   };
 
+  if (view === "landing") {
+    return <LandingView onStart={() => setView("game")} />;
+  }
+
   return (
-    <div className="relative w-full h-full bg-black overflow-hidden">
+    <div className="relative w-full h-full bg-slate-950 overflow-hidden">
       {/* Layer 1: 3D Map */}
       <div className="absolute inset-0 z-0">
-        <Canvas camera={{ position: [5, 5, 5], fov: 50 }}>
-          <Suspense fallback={null}>
-            <ambientLight intensity={0.5} />
-            <pointLight position={[10, 10, 10]} />
-            <mesh position={[0, 0, 0]}>
-              <boxGeometry args={[1, 0.2, 1]} />
-              <meshStandardMaterial color="#4ade80" />
-            </mesh>
-            <gridHelper args={[20, 20]} />
-            <OrbitControls makeDefault />
-          </Suspense>
-        </Canvas>
+        <GameCanvas />
       </div>
 
       {/* Layer 2: HUD */}
-      <div className="absolute top-0 left-0 w-full z-10 pointer-events-none p-4 flex justify-between items-start">
-        <div className="flex flex-col gap-2">
-          <h1 className="text-2xl font-bold text-white drop-shadow-md">
-            Echoes of History: Reforged
-          </h1>
-          <ResourceManager />
-
-          {/* Log Viewer (Temporary) */}
-          <div className="mt-4 w-96 max-h-64 overflow-y-auto bg-black/50 p-2 rounded text-sm text-white pointer-events-auto">
-            {logs.map((log) => (
-              <div
-                key={log.id}
-                className={`mb-1 ${
-                  log.type === "warning" ? "text-red-400" : "text-gray-200"
-                }`}
-              >
-                - {log.text}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Layer 3: Panel */}
-      <div className="absolute right-0 top-0 h-full z-20 pointer-events-none flex justify-end">
-        <ActionPanel />
-      </div>
+      <GameHUD />
 
       {/* Modals */}
       {pendingProposal && (

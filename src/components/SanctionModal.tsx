@@ -30,6 +30,7 @@ export const SanctionModal: React.FC<SanctionModalProps> = ({
 }) => {
   const [flavorText, setFlavorText] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isStamping, setIsStamping] = useState(false);
 
   useEffect(() => {
     if (isOpen && actionType) {
@@ -52,54 +53,97 @@ export const SanctionModal: React.FC<SanctionModalProps> = ({
     }
   }, [isOpen, actionType, title, context]);
 
+  const handleSanctionClick = () => {
+    setIsStamping(true);
+    // Delay actual sanction to show animation
+    setTimeout(() => {
+      onSanction();
+      setIsStamping(false);
+    }, 500);
+  };
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-      <div className="bg-[#f4e4bc] text-black p-8 rounded-sm shadow-2xl max-w-md w-full border-4 border-[#8b5a2b] relative font-serif">
-        <h2 className="text-2xl font-bold mb-4 border-b-2 border-black pb-2 uppercase tracking-widest text-center">
-          {title}
-        </h2>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+      {/* Paper Container */}
+      <div className="relative bg-stone-100 text-stone-900 p-8 md:p-12 max-w-lg w-full paper-shadow rotate-1 transition-transform duration-500 hover:rotate-0">
+        {/* Header */}
+        <div className="mb-6 border-b-2 border-stone-800 pb-4">
+          <h2 className="text-3xl font-serif font-bold text-center text-stone-900">
+            {title}
+          </h2>
+          <div className="text-center text-xs font-mono text-stone-500 mt-1 uppercase tracking-widest">
+            공식 칙령 요청
+          </div>
+        </div>
 
-        <div className="mb-6 space-y-4">
-          <div className="text-lg leading-relaxed min-h-[100px]">
+        {/* Content */}
+        <div className="mb-8 space-y-6">
+          {/* AI Flavor Text / Description */}
+          <div className="min-h-[120px] font-serif text-lg leading-relaxed text-stone-800">
             {isLoading ? (
-              <div className="flex items-center justify-center h-full text-gray-500 animate-pulse">
-                📜 Scribes are writing...
+              <div className="flex items-center justify-center h-full text-stone-400 animate-pulse italic">
+                서기관이 기록을 작성 중입니다...
               </div>
             ) : (
               flavorText || description
             )}
           </div>
 
-          <div className="bg-[#e6d5aa] p-3 border border-[#c0a060]">
-            <p className="font-bold">📉 비용: {cost}</p>
+          {/* Data Section */}
+          <div className="bg-stone-200/50 p-4 border border-stone-300 rounded-sm">
+            <div className="flex justify-between items-center mb-2">
+              <span className="font-bold text-stone-600 text-sm uppercase">
+                소모 자원
+              </span>
+              <span className="font-mono font-bold text-rose-700">{cost}</span>
+            </div>
             {risk && (
-              <p className="font-bold text-red-700 animate-pulse">
-                ⚠️ 경고: {risk}
-              </p>
+              <div className="flex justify-between items-center">
+                <span className="font-bold text-stone-600 text-sm uppercase">
+                  위험 요소
+                </span>
+                <span className="font-bold text-amber-600 animate-pulse text-sm">
+                  ⚠️ {risk}
+                </span>
+              </div>
             )}
           </div>
         </div>
 
-        <div className="flex justify-end gap-4 mt-8">
+        {/* Footer Actions */}
+        <div className="flex justify-between items-center mt-8 pt-4 border-t border-stone-300">
           <button
             onClick={onClose}
-            className="px-6 py-2 border-2 border-gray-600 text-gray-800 hover:bg-gray-200 font-bold uppercase"
+            className="px-6 py-2 text-stone-500 hover:text-stone-900 font-serif font-bold hover:underline decoration-2 underline-offset-4 transition-all"
           >
-            반려 (Reject)
+            반려
           </button>
-          <button
-            onClick={onSanction}
-            className="px-6 py-2 bg-red-800 text-white border-2 border-red-900 hover:bg-red-700 font-bold uppercase shadow-lg transform active:scale-95 transition-transform"
-          >
-            결재 (Sanction)
-          </button>
+
+          <div className="relative">
+            <button
+              onClick={handleSanctionClick}
+              disabled={isStamping}
+              className="px-8 py-3 bg-rose-900 text-stone-100 font-serif font-bold text-lg shadow-lg hover:bg-rose-800 transition-all transform hover:-translate-y-1 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              결재
+            </button>
+
+            {/* Stamp Animation Overlay */}
+            {isStamping && (
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 border-4 border-rose-700 rounded-full flex items-center justify-center text-rose-700 font-black text-xl uppercase rotate-[-15deg] opacity-80 animate-stamp-drop pointer-events-none z-10 mix-blend-multiply">
+                <div className="border-2 border-rose-700 w-[90%] h-[90%] rounded-full flex items-center justify-center">
+                  승인
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Decorative Stamp */}
-        <div className="absolute top-4 right-4 opacity-20 pointer-events-none rotate-12 border-4 border-red-800 text-red-800 p-2 font-black text-xs uppercase rounded">
-          Top Secret
+        {/* Decorative Elements */}
+        <div className="absolute top-4 right-4 opacity-10 pointer-events-none">
+          <div className="w-16 h-16 rounded-full border-4 border-stone-900"></div>
         </div>
       </div>
     </div>
