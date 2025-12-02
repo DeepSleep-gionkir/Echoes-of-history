@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "start": "tsx server/index.ts",
     "dev": "vite",
     "server": "tsx server/index.ts",
     "build": "tsc -b && vite build",
@@ -24,6 +25,7 @@
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",
     "three": "^0.181.2",
+    "tsx": "^4.21.0",
     "zustand": "^5.0.9"
   },
   "devDependencies": {
@@ -42,7 +44,6 @@
     "globals": "^16.5.0",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.17",
-    "tsx": "^4.21.0",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.46.4",
     "vite": "^7.2.4"
