@@ -22,7 +22,7 @@ const resourceIcons: Record<string, React.ReactNode> = {
 };
 
 export const ResourceBar: React.FC = () => {
-  const { resources, buildings, turn, nextTurn } = useGameStore();
+  const { resources, buildings, turn } = useGameStore();
 
   // Calculate Income Rates
   const getIncome = (resKey: string) => {
@@ -99,9 +99,9 @@ export const ResourceBar: React.FC = () => {
         </div>
 
         <button
-          onClick={nextTurn}
+          onClick={() => console.log("Settings clicked")}
           className="p-2 hover:bg-white/10 rounded-full transition-colors active:scale-95"
-          title="다음 턴"
+          title="설정"
         >
           <Settings size={20} className="text-stone-400" />
         </button>
