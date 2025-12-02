@@ -23,7 +23,7 @@ const PORT = process.env.PORT || 3000;
 
 // Initialize Gemini
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
 
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
@@ -45,7 +45,7 @@ io.on("connection", (socket) => {
         If authority is 'ignored', be slightly disrespectful or urgent.
         If authority is 'revered', be highly praiseful and obedient.
         
-        Output ONLY the text, no quotes.
+        Output ONLY the korean text, no quotes.
       `;
 
       const result = await model.generateContent(prompt);
@@ -89,6 +89,12 @@ io.on("connection", (socket) => {
 
 app.get("/", (req, res) => {
   res.send("Echoes of History API Server with Gemini");
+});
+
+// [UptimeRobot 전용 라우트]
+// 브라우저에서 /ping으로 접속하면 "pong"이라고 0.001초 만에 대답함.
+app.get("/ping", (req, res) => {
+  res.send("pong");
 });
 
 httpServer.listen(PORT, () => {
