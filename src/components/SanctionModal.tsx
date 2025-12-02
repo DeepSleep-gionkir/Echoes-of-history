@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { io } from "socket.io-client";
+import { X } from "lucide-react";
 
 // Singleton socket connection (in a real app, move to a context or store)
 const socketUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
@@ -69,7 +70,14 @@ export const SanctionModal: React.FC<SanctionModalProps> = ({
       {/* Paper Container */}
       <div className="relative bg-stone-100 text-stone-900 p-8 md:p-12 max-w-lg w-full paper-shadow rotate-1 transition-transform duration-500 hover:rotate-0">
         {/* Header */}
-        <div className="mb-6 border-b-2 border-stone-800 pb-4">
+        <div className="mb-6 border-b-2 border-stone-800 pb-4 relative">
+          <button
+            onClick={onClose}
+            className="absolute -top-2 -right-2 p-2 text-stone-400 hover:text-stone-800 transition-colors"
+            title="닫기"
+          >
+            <X size={24} />
+          </button>
           <h2 className="text-3xl font-serif font-bold text-center text-stone-900">
             {title}
           </h2>

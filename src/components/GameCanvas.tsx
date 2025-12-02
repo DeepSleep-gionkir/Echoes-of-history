@@ -14,6 +14,38 @@ interface HexTileProps {
   onClick: (pos: [number, number, number]) => void;
 }
 
+// Selection Ring Component
+function SelectionRing({ position }: { position: [number, number, number] }) {
+  const ringRef = useRef<THREE.Mesh>(null);
+
+  useEffect(() => {
+    if (ringRef.current) {
+      // Simple bobbing animation
+      let start = Date.now();
+      const animate = () => {
+        if (ringRef.current) {
+          const elapsed = (Date.now() - start) / 1000;
+          ringRef.current.position.y =
+            position[1] + 0.5 + Math.sin(elapsed * 2) * 0.1;
+        }
+        requestAnimationFrame(animate);
+      };
+      animate();
+    }
+  }, [position]);
+
+  return (
+    <mesh
+      ref={ringRef}
+      position={[position[0], position[1] + 0.5, position[2]]}
+      rotation={[Math.PI / 2, 0, 0]}
+    >
+      <torusGeometry args={[0.9, 0.05, 16, 6]} /> {/* Hexagonal Torus */}
+      <meshBasicMaterial color="#fbbf24" transparent opacity={0.8} />
+    </mesh>
+  );
+}
+
 function HexTile({ position, color, onClick }: HexTileProps) {
   const [hovered, setHovered] = useState(false);
 
@@ -29,14 +61,16 @@ function HexTile({ position, color, onClick }: HexTileProps) {
       onPointerOut={() => setHovered(false)}
     >
       <meshStandardMaterial
-        color={hovered ? "#fbbf24" : color} // Amber-400 on hover
+        color={color}
+        emissive={hovered ? "#fbbf24" : "#000000"}
+        emissiveIntensity={hovered ? 0.5 : 0}
         roughness={0.8}
         metalness={0.1}
       />
       {/* Border */}
       <lineSegments>
         <edgesGeometry args={[hexGeometry]} />
-        <lineBasicMaterial color="#ffffff" opacity={0.2} transparent />
+        <lineBasicMaterial color="#57534e" opacity={0.3} transparent />
       </lineSegments>
     </mesh>
   );
@@ -54,8 +88,9 @@ function HexGrid({
     for (let r = -size; r <= size; r++) {
       if (Math.abs(q + r) <= size) {
         // Hex to Pixel conversion (Pointy topped)
-        const x = size * 0.4 * (Math.sqrt(3) * q + (Math.sqrt(3) / 2) * r);
-        const z = size * 0.4 * ((3 / 2) * r);
+        // Multiplier 1.0 for seamless packing of radius 1 hexes
+        const x = 1.0 * (Math.sqrt(3) * q + (Math.sqrt(3) / 2) * r);
+        const z = 1.0 * ((3 / 2) * r);
 
         // Simple terrain generation based on position
         let color = "#10b981"; // Grass (Emerald-500)
@@ -100,6 +135,8 @@ export const GameCanvas = () => {
 
   return (
     <Canvas camera={{ position: [10, 10, 10], fov: 45 }} shadows>
+      <color attach="background" args={["#1a1b1e"]} />
+      <fog attach="fog" args={["#1a1b1e", 10, 40]} />
       <Suspense fallback={null}>
         <ambientLight intensity={0.4} />
         <pointLight position={[10, 20, 10]} intensity={1} castShadow />
@@ -116,11 +153,14 @@ export const GameCanvas = () => {
         <HexGrid onTileClick={handleTileClick} />
 
         {selectedTile && (
-          <RadialMenu
-            position={[selectedTile[0], selectedTile[1] + 1, selectedTile[2]]}
-            onClose={() => setSelectedTile(null)}
-            onAction={handleMenuAction}
-          />
+          <>
+            <SelectionRing position={selectedTile} />
+            <RadialMenu
+              position={[selectedTile[0], selectedTile[1] + 1, selectedTile[2]]}
+              onClose={() => setSelectedTile(null)}
+              onAction={handleMenuAction}
+            />
+          </>
         )}
 
         <ControlsWithSpacePan />
