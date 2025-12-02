@@ -48,6 +48,10 @@ interface GameState {
     showConstruction: boolean;
   };
   setUiState: (newState: Partial<GameState["uiState"]>) => void;
+
+  // Auth State
+  user: any | null;
+  setUser: (user: any) => void;
 }
 
 export const useGameStore = create<GameState>((set, get) => ({
@@ -122,17 +126,28 @@ export const useGameStore = create<GameState>((set, get) => ({
       uiState: { ...state.uiState, ...newState },
     })),
 
+  // Auth State
+  user: null as any | null,
+  setUser: (user: any) => set({ user }),
+
   loadGame: async () => {
+    const { user } = get();
+    if (!user) return;
+
     set({ isLoading: true });
     try {
-      let user = await DBService.getUser();
-      if (!user) {
-        console.log("No user found, creating new one...");
-        user = await DBService.createUser();
+      let dbUser = await DBService.getUser(user.id);
+
+      if (!dbUser) {
+        console.log("No user found in DB, creating new one...");
+        dbUser = await DBService.createUser(
+          user.id,
+          user.user_metadata?.full_name || "New Kingdom"
+        );
       }
 
-      if (user && user.resources) {
-        set({ resources: user.resources });
+      if (dbUser && dbUser.resources) {
+        set({ resources: dbUser.resources });
         // Load other state if available
       }
     } catch (e) {
@@ -143,7 +158,9 @@ export const useGameStore = create<GameState>((set, get) => ({
   },
 
   saveGame: async () => {
-    const { resources, factions } = get();
-    await DBService.saveState(resources, factions);
+    const { resources, factions, user } = get();
+    if (!user) return;
+
+    await DBService.saveState(user.id, resources, factions);
   },
 }));

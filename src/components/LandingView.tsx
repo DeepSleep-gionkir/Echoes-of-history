@@ -1,6 +1,9 @@
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Stars } from "@react-three/drei";
 import { Suspense, useState, useEffect } from "react";
+import { AuthService } from "../services/auth";
+import { useGameStore } from "../store/useGameStore";
+import { LogIn } from "lucide-react";
 
 interface LandingViewProps {
   onStart: () => void;
@@ -25,6 +28,7 @@ function RotatingMap() {
 export function LandingView({ onStart }: LandingViewProps) {
   const [text, setText] = useState("");
   const fullText = "당신의 말이 역사가 된다.";
+  const { user, setUser } = useGameStore();
 
   useEffect(() => {
     let index = 0;
@@ -33,16 +37,33 @@ export function LandingView({ onStart }: LandingViewProps) {
       index++;
       if (index === fullText.length) clearInterval(interval);
     }, 100);
-    return () => clearInterval(interval);
+
+    // Check Auth Session
+    AuthService.getUser().then((user) => {
+      if (user) setUser(user);
+    });
+
+    const { data: authListener } = AuthService.onAuthStateChange((user) => {
+      setUser(user);
+    });
+
+    return () => {
+      clearInterval(interval);
+      authListener.subscription.unsubscribe();
+    };
   }, []);
+
+  const handleLogin = async () => {
+    await AuthService.signInWithGoogle();
+  };
 
   return (
     <div className="relative w-full h-full bg-slate-950 overflow-hidden flex flex-col items-center justify-center text-center">
       {/* Background Layer */}
-      <div className="absolute inset-0 z-0 opacity-50">
+      <div className="absolute inset-0 z-0 opacity-80">
         <Canvas camera={{ position: [0, 5, 10], fov: 45 }}>
           <Suspense fallback={null}>
-            <ambientLight intensity={0.2} />
+            <ambientLight intensity={0.5} />
             <pointLight position={[10, 10, 10]} />
             <Stars
               radius={100}
@@ -65,7 +86,7 @@ export function LandingView({ onStart }: LandingViewProps) {
       </div>
 
       {/* Content Layer */}
-      <div className="z-10 flex flex-col items-center gap-8 p-4">
+      <div className="relative z-10 flex flex-col items-center gap-8 p-4">
         <div className="flex flex-col items-center gap-2">
           <h1 className="text-6xl md:text-8xl font-serif font-bold text-stone-100 drop-shadow-2xl tracking-tight">
             Echoes of History
@@ -76,13 +97,32 @@ export function LandingView({ onStart }: LandingViewProps) {
           </p>
         </div>
 
-        <button
-          onClick={onStart}
-          className="group relative px-8 py-4 bg-stone-100 text-slate-900 font-bold text-lg rounded-sm shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:shadow-[0_0_30px_rgba(255,255,255,0.5)] transition-all duration-300 transform hover:-translate-y-1 active:scale-95"
-        >
-          <span className="relative z-10">역사 속으로 입장하기</span>
-          <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity rounded-sm" />
-        </button>
+        {user ? (
+          <div className="flex flex-col items-center gap-4 animate-fade-in">
+            <p className="text-stone-300">
+              환영합니다,{" "}
+              <span className="font-bold text-amber-400">
+                {user.user_metadata?.full_name || "지도자"}
+              </span>
+              님.
+            </p>
+            <button
+              onClick={onStart}
+              className="group relative px-8 py-4 bg-stone-100 text-slate-900 font-bold text-lg rounded-sm shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:shadow-[0_0_30px_rgba(255,255,255,0.5)] transition-all duration-300 transform hover:-translate-y-1 active:scale-95"
+            >
+              <span className="relative z-10">역사 속으로 입장하기</span>
+              <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity rounded-sm" />
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={handleLogin}
+            className="flex items-center gap-3 px-6 py-3 bg-white text-slate-900 font-bold rounded shadow-lg hover:bg-gray-100 transition-all transform hover:-translate-y-1 active:scale-95"
+          >
+            <LogIn size={20} />
+            <span>Google 계정으로 시작하기</span>
+          </button>
+        )}
       </div>
 
       {/* Footer */}

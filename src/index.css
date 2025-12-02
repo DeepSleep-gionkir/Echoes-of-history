@@ -2,7 +2,8 @@
 
 @layer base {
   html,
-  body {
+  body,
+  #root {
     @apply h-full w-full overflow-hidden antialiased bg-slate-950 text-stone-100;
     font-family: "Pretendard Variable", -apple-system, BlinkMacSystemFont,
       system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo",
